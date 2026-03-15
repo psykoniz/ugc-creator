@@ -8,7 +8,7 @@ export const ProductBriefSchema = z.object({
   targetAudience: z.string().min(1),
   keyBenefits: z.array(z.string().min(1)).min(1),
   tone: z.string().min(1),
-  imageUrls: z.array(z.string().url()).default([]),
+  imageUrls: z.array(z.string().url()),
 });
 
 // ─── Ingest ───
