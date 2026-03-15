@@ -8,26 +8,26 @@ import { LoadingButton } from "@/components/shared/loading-button";
 import { ErrorBanner } from "@/components/shared/error-banner";
 import { useAsyncAction } from "@/hooks/use-async-action";
 import * as api from "@/lib/api";
-import type { Product } from "@ugc/shared";
+import type { IngestResponse } from "@/lib/api";
 import { X } from "lucide-react";
 
 interface ImagesFormProps {
-  onSuccess: (product: Product) => void;
+  onSuccess: (result: IngestResponse) => void;
 }
 
 export function ImagesForm({ onSuccess }: ImagesFormProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [imageUrls, setImageUrls] = useState<string[]>([""]);
-  const { loading, error, execute } = useAsyncAction<Product>();
+  const { loading, error, execute } = useAsyncAction<IngestResponse>();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const validUrls = imageUrls.filter((u) => u.trim());
-    const product = await execute(() =>
+    const result = await execute(() =>
       api.ingestImages({ imageUrls: validUrls, name, description })
     );
-    if (product) onSuccess(product);
+    if (result) onSuccess(result);
   };
 
   return (

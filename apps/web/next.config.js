@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: "standalone",
   transpilePackages: ["@ugc/shared"],
   webpack: (config) => {
     config.resolve.extensionAlias = {
@@ -11,7 +12,7 @@ const nextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: "http://localhost:4000/api/:path*",
+        destination: `${process.env.API_URL || "http://localhost:4000"}/api/:path*`,
       },
     ];
   },

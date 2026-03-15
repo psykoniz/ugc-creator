@@ -46,10 +46,23 @@ async function fetcher<T>(
   return data as T;
 }
 
+// ─── Response types (match actual API shapes) ───
+
+export interface IngestResponse {
+  product_id: string;
+  product_brief: ProductBrief;
+}
+
+export interface CreativePackResponse {
+  creative_pack: CreativePack;
+  hooks: Hook[];
+  scripts: Script[];
+}
+
 // ─── Ingest ───
 
 export function ingestUrl(url: string) {
-  return fetcher<Product>("POST", "/api/ingest/url", { url });
+  return fetcher<IngestResponse>("POST", "/api/ingest/url", { url });
 }
 
 export function ingestImages(data: {
@@ -57,7 +70,7 @@ export function ingestImages(data: {
   name: string;
   description: string;
 }) {
-  return fetcher<Product>("POST", "/api/ingest/images", data);
+  return fetcher<IngestResponse>("POST", "/api/ingest/images", data);
 }
 
 export function ingestPrompt(data: {
@@ -67,13 +80,15 @@ export function ingestPrompt(data: {
   keyBenefits: string[];
   tone: string;
 }) {
-  return fetcher<Product>("POST", "/api/ingest/prompt", data);
+  return fetcher<IngestResponse>("POST", "/api/ingest/prompt", data);
 }
 
 // ─── Creative ───
 
 export function createCreativePack(productId: string) {
-  return fetcher<CreativePack>("POST", "/api/creative/pack", { productId });
+  return fetcher<CreativePackResponse>("POST", "/api/creative/pack", {
+    productId,
+  });
 }
 
 export function mutateScript(scriptId: string, mutationType: MutationType) {

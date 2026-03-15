@@ -9,11 +9,11 @@ import { LoadingButton } from "@/components/shared/loading-button";
 import { ErrorBanner } from "@/components/shared/error-banner";
 import { useAsyncAction } from "@/hooks/use-async-action";
 import * as api from "@/lib/api";
-import type { Product } from "@ugc/shared";
+import type { IngestResponse } from "@/lib/api";
 import { X } from "lucide-react";
 
 interface PromptFormProps {
-  onSuccess: (product: Product) => void;
+  onSuccess: (result: IngestResponse) => void;
 }
 
 export function PromptForm({ onSuccess }: PromptFormProps) {
@@ -22,15 +22,15 @@ export function PromptForm({ onSuccess }: PromptFormProps) {
   const [targetAudience, setTargetAudience] = useState("");
   const [tone, setTone] = useState("");
   const [keyBenefits, setKeyBenefits] = useState<string[]>([""]);
-  const { loading, error, execute } = useAsyncAction<Product>();
+  const { loading, error, execute } = useAsyncAction<IngestResponse>();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const validBenefits = keyBenefits.filter((b) => b.trim());
-    const product = await execute(() =>
+    const result = await execute(() =>
       api.ingestPrompt({ name, description, targetAudience, tone, keyBenefits: validBenefits })
     );
-    if (product) onSuccess(product);
+    if (result) onSuccess(result);
   };
 
   return (

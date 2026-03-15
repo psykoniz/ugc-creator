@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import type { Product, IngestSource } from "@ugc/shared";
+import type { IngestSource } from "@ugc/shared";
+import type { IngestResponse } from "@/lib/api";
 import { SourceSelector } from "@/components/intake/source-selector";
 import { UrlForm } from "@/components/intake/url-form";
 import { ImagesForm } from "@/components/intake/images-form";
@@ -10,7 +11,7 @@ import { ProductBriefPreview } from "@/components/intake/product-brief-preview";
 
 export default function IntakePage() {
   const [sourceType, setSourceType] = useState<IngestSource>("url");
-  const [product, setProduct] = useState<Product | null>(null);
+  const [ingestResult, setIngestResult] = useState<IngestResponse | null>(null);
 
   return (
     <div className="space-y-6">
@@ -24,14 +25,17 @@ export default function IntakePage() {
       <SourceSelector value={sourceType} onChange={setSourceType} />
 
       <div className="max-w-xl">
-        {sourceType === "url" && <UrlForm onSuccess={setProduct} />}
-        {sourceType === "images" && <ImagesForm onSuccess={setProduct} />}
-        {sourceType === "prompt" && <PromptForm onSuccess={setProduct} />}
+        {sourceType === "url" && <UrlForm onSuccess={setIngestResult} />}
+        {sourceType === "images" && <ImagesForm onSuccess={setIngestResult} />}
+        {sourceType === "prompt" && <PromptForm onSuccess={setIngestResult} />}
       </div>
 
-      {product && (
+      {ingestResult && (
         <div className="max-w-xl">
-          <ProductBriefPreview product={product} />
+          <ProductBriefPreview
+            productId={ingestResult.product_id}
+            brief={ingestResult.product_brief}
+          />
         </div>
       )}
     </div>

@@ -7,20 +7,20 @@ import { LoadingButton } from "@/components/shared/loading-button";
 import { ErrorBanner } from "@/components/shared/error-banner";
 import { useAsyncAction } from "@/hooks/use-async-action";
 import * as api from "@/lib/api";
-import type { Product } from "@ugc/shared";
+import type { IngestResponse } from "@/lib/api";
 
 interface UrlFormProps {
-  onSuccess: (product: Product) => void;
+  onSuccess: (result: IngestResponse) => void;
 }
 
 export function UrlForm({ onSuccess }: UrlFormProps) {
   const [url, setUrl] = useState("");
-  const { loading, error, execute } = useAsyncAction<Product>();
+  const { loading, error, execute } = useAsyncAction<IngestResponse>();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const product = await execute(() => api.ingestUrl(url));
-    if (product) onSuccess(product);
+    const result = await execute(() => api.ingestUrl(url));
+    if (result) onSuccess(result);
   };
 
   return (

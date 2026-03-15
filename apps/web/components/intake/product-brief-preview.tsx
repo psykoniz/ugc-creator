@@ -8,27 +8,31 @@ import { ErrorBanner } from "@/components/shared/error-banner";
 import { useAsyncAction } from "@/hooks/use-async-action";
 import { useSessionState } from "@/hooks/use-session-state";
 import * as api from "@/lib/api";
-import type { Product, CreativePack } from "@ugc/shared";
+import type { CreativePackResponse } from "@/lib/api";
+import type { ProductBrief, CreativePack, Hook, Script } from "@ugc/shared";
 
 interface ProductBriefPreviewProps {
-  product: Product;
+  productId: string;
+  brief: ProductBrief;
 }
 
-export function ProductBriefPreview({ product }: ProductBriefPreviewProps) {
+export function ProductBriefPreview({ productId, brief }: ProductBriefPreviewProps) {
   const router = useRouter();
-  const { loading, error, execute } = useAsyncAction<CreativePack>();
+  const { loading, error, execute } = useAsyncAction<CreativePackResponse>();
   const [, setProductId] = useSessionState<string>("productId", "");
   const [, setCreativePackId] = useSessionState<string>("creativePackId", "");
   const [, setCreativePack] = useSessionState<CreativePack | null>("creativePack", null);
-
-  const brief = product.brief;
+  const [, setHooks] = useSessionState<Hook[]>("hooks", []);
+  const [, setScripts] = useSessionState<Script[]>("scripts", []);
 
   const handleCreate = async () => {
-    const pack = await execute(() => api.createCreativePack(product.id));
-    if (pack) {
-      setProductId(product.id);
-      setCreativePackId(pack.id);
-      setCreativePack(pack);
+    const result = await execute(() => api.createCreativePack(productId));
+    if (result) {
+      setProductId(productId);
+      setCreativePackId(result.creative_pack.id);
+      setCreativePack(result.creative_pack);
+      setHooks(result.hooks);
+      setScripts(result.scripts);
       router.push("/create");
     }
   };
