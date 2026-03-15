@@ -17,7 +17,7 @@ export const creativePacks = pgTable("creative_packs", {
   id: text("id").primaryKey(), // cpk_...
   productId: text("product_id")
     .notNull()
-    .references(() => products.id),
+    .references(() => products.id, { onDelete: "cascade" }),
   angles: jsonb("angles").notNull().$type<string[]>(),
   cta: jsonb("cta").notNull().$type<string[]>(),
   styles: jsonb("styles").notNull().$type<string[]>(),
@@ -30,7 +30,7 @@ export const hooks = pgTable("hooks", {
   id: text("id").primaryKey(), // hook_...
   creativePackId: text("creative_pack_id")
     .notNull()
-    .references(() => creativePacks.id),
+    .references(() => creativePacks.id, { onDelete: "cascade" }),
   text: text("text").notNull(),
   angle: text("angle").notNull(),
   createdAt: text("created_at").notNull(),
@@ -42,10 +42,10 @@ export const scripts = pgTable("scripts", {
   id: text("id").primaryKey(), // scr_...
   creativePackId: text("creative_pack_id")
     .notNull()
-    .references(() => creativePacks.id),
+    .references(() => creativePacks.id, { onDelete: "cascade" }),
   hookId: text("hook_id")
     .notNull()
-    .references(() => hooks.id),
+    .references(() => hooks.id, { onDelete: "cascade" }),
   body: text("body").notNull(),
   cta: text("cta").notNull(),
   style: text("style").notNull(),
@@ -60,10 +60,10 @@ export const experiments = pgTable("experiments", {
   id: text("id").primaryKey(), // exp_...
   productId: text("product_id")
     .notNull()
-    .references(() => products.id),
+    .references(() => products.id, { onDelete: "cascade" }),
   creativePackId: text("creative_pack_id")
     .notNull()
-    .references(() => creativePacks.id),
+    .references(() => creativePacks.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   winnerOutputId: text("winner_output_id"), // nullable, set when winner chosen
   createdAt: text("created_at").notNull(),
@@ -75,10 +75,10 @@ export const jobs = pgTable("jobs", {
   id: text("id").primaryKey(), // job_...
   experimentId: text("experiment_id")
     .notNull()
-    .references(() => experiments.id),
+    .references(() => experiments.id, { onDelete: "cascade" }),
   scriptId: text("script_id")
     .notNull()
-    .references(() => scripts.id),
+    .references(() => scripts.id, { onDelete: "cascade" }),
   status: text("status").notNull().default("pending"), // "pending" | "running" | "done" | "failed"
   provider: text("provider").notNull(), // e.g. "fal", "anthropic"
   retryCount: integer("retry_count").notNull().default(0),
@@ -94,10 +94,10 @@ export const outputs = pgTable("outputs", {
   id: text("id").primaryKey(), // out_...
   jobId: text("job_id")
     .notNull()
-    .references(() => jobs.id),
+    .references(() => jobs.id, { onDelete: "cascade" }),
   experimentId: text("experiment_id")
     .notNull()
-    .references(() => experiments.id),
+    .references(() => experiments.id, { onDelete: "cascade" }),
   videoUrl: text("video_url").notNull(),
   thumbnailUrl: text("thumbnail_url"),
   duration: real("duration"),
@@ -113,7 +113,7 @@ export const ratings = pgTable("ratings", {
   id: text("id").primaryKey(), // rat_...
   outputId: text("output_id")
     .notNull()
-    .references(() => outputs.id),
+    .references(() => outputs.id, { onDelete: "cascade" }),
   heuristicScore: real("heuristic_score").notNull(),
   llmScore: real("llm_score").notNull(),
   businessScore: real("business_score").notNull(),
