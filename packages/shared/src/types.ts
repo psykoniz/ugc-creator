@@ -145,6 +145,50 @@ export const SCORING_THRESHOLDS = {
   mutate: 0.5,
 } as const;
 
+/**
+ * Configurable heuristic scoring parameters.
+ * Extracted from ranking-engine so they can be tuned without code changes.
+ */
+export const HEURISTIC_CONFIG = {
+  /** Baseline score before any bonuses */
+  baseline: 0.5,
+  /** Optimal word count range for scripts */
+  wordCount: {
+    optimal: { min: 50, max: 200, bonus: 0.2 },
+    acceptable: { min: 30, max: 300, bonus: 0.1 },
+  },
+  /** CTA length range (characters) */
+  ctaLength: { min: 5, max: 100, bonus: 0.15 },
+  /** Recognized UGC video styles */
+  validStyles: [
+    "talking_head",
+    "product_demo",
+    "lifestyle",
+    "testimonial",
+    "unboxing",
+  ] as string[],
+  styleBonus: 0.15,
+} as const;
+
+export const BUSINESS_CONFIG = {
+  baseline: 0.5,
+  /** Action words that indicate strong CTAs */
+  actionWords: [
+    "buy", "get", "try", "shop", "order",
+    "start", "click", "grab", "save", "discover",
+    "unlock", "claim", "join",
+  ] as string[],
+  actionBonus: 0.2,
+  /** Benefit/value words in script body */
+  benefitWords: [
+    "benefit", "result", "improve", "transform",
+    "change", "help", "save", "easy", "fast",
+    "proven", "guaranteed", "free",
+  ] as string[],
+  benefitBonusEach: 0.1,
+  benefitBonusMax: 0.3,
+} as const;
+
 // ─── Limits ───
 
 export const MAX_RENDERS_PER_BATCH = 20;

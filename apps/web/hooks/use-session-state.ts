@@ -2,12 +2,32 @@
 
 import { useState, useCallback } from "react";
 
+/**
+ * Persists state to localStorage (survives tab close & browser restart).
+ * All keys are prefixed with "ugc:" to avoid collisions.
+ *
+ * NOTE: Previously used sessionStorage — migrated to localStorage so that
+ * experiment history is preserved across sessions.
+ */
 export function useSessionState<T>(key: string, initialValue: T): [T, (value: T) => void] {
+  const prefixedKey = `ugc:${key}`;
+
   const [state, setState] = useState<T>(() => {
     if (typeof window === "undefined") return initialValue;
     try {
-      const stored = sessionStorage.getItem(key);
-      return stored ? (JSON.parse(stored) as T) : initialValue;
+      // Try localStorage first, fall back to sessionStorage for migration
+      const stored = localStorage.getItem(prefixedKey)
+        ?? sessionStorage.getItem(key);
+      if (stored) {
+        const parsed = JSON.parse(stored) as T;
+        // Migrate from sessionStorage to localStorage
+        if (!localStorage.getItem(prefixedKey)) {
+          localStorage.setItem(prefixedKey, stored);
+          sessionStorage.removeItem(key);
+        }
+        return parsed;
+      }
+      return initialValue;
     } catch {
       return initialValue;
     }
@@ -17,12 +37,12 @@ export function useSessionState<T>(key: string, initialValue: T): [T, (value: T)
     (value: T) => {
       setState(value);
       try {
-        sessionStorage.setItem(key, JSON.stringify(value));
+        localStorage.setItem(prefixedKey, JSON.stringify(value));
       } catch {
         // ignore quota errors
       }
     },
-    [key]
+    [prefixedKey]
   );
 
   return [state, setValue];

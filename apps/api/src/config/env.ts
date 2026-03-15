@@ -16,6 +16,12 @@ const EnvSchema = z.object({
 
   // Fal
   FAL_API_KEY: z.string().optional(),
+  FAL_ENDPOINT: z.string().optional(), // Override default video model endpoint
+  FAL_ASPECT_RATIO: z.string().optional(), // Override default aspect ratio (e.g. "9:16", "16:9")
+
+  // ElevenLabs voice config
+  ELEVENLABS_VOICE_ID: z.string().optional(), // Override default voice (Rachel)
+  ELEVENLABS_MODEL_ID: z.string().optional(), // Override default model (eleven_monolingual_v1)
 
   // Anthropic
   ANTHROPIC_API_KEY: z.string().optional(),

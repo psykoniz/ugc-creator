@@ -12,6 +12,8 @@ import { z } from "zod";
 import {
   SCORING_WEIGHTS,
   SCORING_THRESHOLDS,
+  HEURISTIC_CONFIG,
+  BUSINESS_CONFIG,
   type RatingDecision,
   type ProductBrief,
 } from "@ugc/shared";
@@ -40,8 +42,6 @@ export async function scoreOutput(outputId: string): Promise<{
   decision: RatingDecision;
 }> {
   // 1. Gather context
-  const outputs = await outputQueries.getOutputsByExperimentId("");
-  // We need to get the output and its related data
   const allOutputs = await getAllOutputData(outputId);
   if (!allOutputs) {
     throw new Error(`Output not found or missing relations: ${outputId}`);
@@ -134,25 +134,25 @@ function calculateHeuristicScore(script: {
   cta: string;
   style: string;
 }): number {
-  let score = 0.5; // baseline
+  const h = HEURISTIC_CONFIG;
+  let score = h.baseline;
 
-  // Script length: prefer 50-200 words
+  // Script length: prefer optimal word count range
   const wordCount = script.body.split(/\s+/).length;
-  if (wordCount >= 50 && wordCount <= 200) {
-    score += 0.2;
-  } else if (wordCount >= 30 && wordCount <= 300) {
-    score += 0.1;
+  if (wordCount >= h.wordCount.optimal.min && wordCount <= h.wordCount.optimal.max) {
+    score += h.wordCount.optimal.bonus;
+  } else if (wordCount >= h.wordCount.acceptable.min && wordCount <= h.wordCount.acceptable.max) {
+    score += h.wordCount.acceptable.bonus;
   }
 
   // CTA present and reasonable length
-  if (script.cta.length > 5 && script.cta.length < 100) {
-    score += 0.15;
+  if (script.cta.length > h.ctaLength.min && script.cta.length < h.ctaLength.max) {
+    score += h.ctaLength.bonus;
   }
 
   // Style is a recognized format
-  const validStyles = ["talking_head", "product_demo", "lifestyle", "testimonial", "unboxing"];
-  if (validStyles.includes(script.style)) {
-    score += 0.15;
+  if (h.validStyles.includes(script.style)) {
+    score += h.styleBonus;
   }
 
   return Math.min(1, Math.max(0, score));
@@ -164,20 +164,19 @@ function calculateBusinessScore(script: {
   body: string;
   cta: string;
 }): number {
-  let score = 0.5; // baseline
+  const b = BUSINESS_CONFIG;
+  let score = b.baseline;
 
   // Has action words in CTA
-  const actionWords = ["buy", "get", "try", "shop", "order", "start", "click", "grab", "save"];
   const ctaLower = script.cta.toLowerCase();
-  if (actionWords.some((w) => ctaLower.includes(w))) {
-    score += 0.2;
+  if (b.actionWords.some((w) => ctaLower.includes(w))) {
+    score += b.actionBonus;
   }
 
   // Body mentions benefits or results
-  const benefitWords = ["benefit", "result", "improve", "transform", "change", "help", "save", "easy"];
   const bodyLower = script.body.toLowerCase();
-  const benefitCount = benefitWords.filter((w) => bodyLower.includes(w)).length;
-  score += Math.min(0.3, benefitCount * 0.1);
+  const benefitCount = b.benefitWords.filter((w) => bodyLower.includes(w)).length;
+  score += Math.min(b.benefitBonusMax, benefitCount * b.benefitBonusEach);
 
   return Math.min(1, Math.max(0, score));
 }
