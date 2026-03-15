@@ -13,11 +13,11 @@
   "dependencies": {
     "@ugc/shared": "workspace:*",
     "@ugc/prompts": "workspace:*",
+    "@hono/node-server": "^1.13.0",
     "hono": "^4.6.0",
     "drizzle-orm": "^0.38.0",
     "postgres": "^3.4.0",
     "bullmq": "^5.0.0",
-    "ioredis": "^5.4.0",
     "zod": "^3.24.0",
     "nanoid": "^5.0.9",
     "@anthropic-ai/sdk": "^0.39.0",
